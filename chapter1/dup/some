@@ -1,0 +1,14 @@
+line line line | first.txt 1
+
+line line line | second.txt 1
+
+line line      | second.txt 1
+
+[s][f] == 1
+[s][f] == 1
+
+[s][s] == 1
+[s][s] == 1
+
+[s2][s] == 1
+[s2][s] == 1
