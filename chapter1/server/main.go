@@ -21,6 +21,9 @@ func main() {
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
+	mu.Lock()
+	count++
+	mu.Unlock()
 	fmt.Fprintf(w, "%s %s %s\n", r.Method, r.URL, r.Proto)
 	for k, v := range r.Header {
 		fmt.Fprintf(w, "Header[%q] = %q\n", k, v)
