@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
 	"os"
 	"strings"
 
@@ -9,12 +11,22 @@ import (
 )
 
 func main() {
-	doc, err := html.Parse(os.Stdin)
+	if len(os.Args) != 2 {
+		log.Fatalf("use: outline [url]")
+	}
+
+	resp, err := http.Get(os.Args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	doc, err := html.Parse(resp.Body)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "outline: %v\n", err)
 		os.Exit(1)
 	}
-	printer(doc)
+	forEachNode(doc, startElement, endElement)
 }
 
 func outline(stack []string, n *html.Node) {
@@ -53,5 +65,45 @@ func printer(n *html.Node) {
 	}
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		printer(c)
+	}
+}
+
+func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
+	if pre != nil {
+		pre(n)
+	}
+
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		forEachNode(c, pre, post)
+	}
+
+	if post != nil {
+		post(n)
+	}
+}
+
+var depth = 0
+
+func startElement(n *html.Node) {
+	if n.Type == html.ElementNode {
+		if n.FirstChild == nil {
+			fmt.Printf("%*s</%s", depth*2, "", n.Data)
+		} else {
+			fmt.Printf("%*s<%s", depth*2, "", n.Data)
+		}
+		for _, a := range n.Attr {
+			fmt.Printf(" %s=%s", a.Key, a.Val)
+		}
+		fmt.Printf(">\n")
+		depth++
+	}
+}
+
+func endElement(n *html.Node) {
+	if n.Type == html.ElementNode {
+		depth--
+		if n.FirstChild != nil {
+			fmt.Printf("%*s</%s>\n", depth*2, "", n.Data)
+		}
 	}
 }
