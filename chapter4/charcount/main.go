@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"unicode"
 	"unicode/utf8"
@@ -22,8 +23,7 @@ func main() {
 			break
 		}
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "charcount: %v\n", err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 		if r == unicode.ReplacementChar && n == 1 {
 			invalid++

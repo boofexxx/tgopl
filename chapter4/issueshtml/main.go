@@ -36,5 +36,4 @@ func main() {
 	if err := issueList.Execute(os.Stdout, result); err != nil {
 		log.Fatal(err)
 	}
-
 }

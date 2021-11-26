@@ -1,8 +1,26 @@
 package tree
 
+import "strconv"
+
 type tree struct {
 	value       int
 	left, right *tree
+}
+
+func (t *tree) String() string {
+	if t == nil {
+		return ""
+	}
+	s := ""
+	sep := " "
+	if t.left != nil {
+		s += t.left.String()
+	}
+	s += strconv.Itoa(t.value) + sep // added sep at the end for simplicity
+	if t.right != nil {
+		s += t.right.String()
+	}
+	return s
 }
 
 func Sort(values []int) {
